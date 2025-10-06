@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #283E51, #485563);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.4);
+            text-align: center;
+            width: 350px;
+        }
+        h2 { margin-bottom: 10px; font-size: 1.5rem; }
+        p { margin-bottom: 20px; }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        a:hover { background: #b72d3b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, {{ username }} 👋</h2>
+        <p>This is your secure dashboard.</p>
+        <a href="/logout">Logout</a>
+    </div>
+</body>
+</html>
