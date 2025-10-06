@@ -4,12 +4,11 @@ import bcrypt
 import time
 
 app = Flask(__name__)
-app.secret_key = 'b7e0f3a1c5d94e2f8a3b0d7e9c4f1a2b'  # 🔑 Secure session secret
+app.secret_key = 'b7e0f3a1c5d94e2f8a3b0d7e9c4f1a2b'  
 
-# 🧠 In-memory blacklist for invalidated session tokens (demo purpose)
 invalid_tokens = set()
 
-# 🧰 Initialize database
+# database
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -25,12 +24,12 @@ def init_db():
     conn.commit()
     conn.close()
 
-# 🏡 Home Page
+# Home page
 @app.route('/')
 def home():
     return render_template('home.html')
 
-# 📝 Signup Page
+# Signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -54,7 +53,7 @@ def signup():
 
     return render_template('signup.html')
 
-# 🔐 Login Page with Account Lockout + Session Rotation
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -73,30 +72,30 @@ def login():
         stored_hash, failed_attempts, lock_until = row
 
         now = time.time()
-        # ⏰ Check if account is locked
+        
         if lock_until and now < lock_until:
             conn.close()
             return "Account is locked due to multiple failed attempts. Try again later."
 
-        # ✅ Password match
+
         if bcrypt.checkpw(password.encode('utf-8'), stored_hash):
-            # Reset failed attempts after successful login
             c.execute("UPDATE users SET failed_attempts = 0, lock_until = 0 WHERE username = ?", (username,))
             conn.commit()
             conn.close()
 
-            # 🔁 Session rotation for security
+
+            
             session.clear()
             session['username'] = username
-            session['session_token'] = str(time.time())  # Unique session ID
+            session['session_token'] = str(time.time()) 
             return redirect('/dashboard')
 
         else:
-            # ❌ Wrong password, increase failed attempts
+
             failed_attempts += 1
             lock_time = 0
             if failed_attempts >= 5:
-                lock_time = now + 300  # Lock for 5 minutes
+                lock_time = now + 300  
 
             c.execute("UPDATE users SET failed_attempts = ?, lock_until = ? WHERE username = ?",
                       (failed_attempts, lock_time, username))
@@ -106,7 +105,7 @@ def login():
 
     return render_template('login.html')
 
-# 🧭 Dashboard Page (Protected)
+# Dashboard page 
 @app.route('/dashboard')
 def dashboard():
     if 'username' in session and 'session_token' in session:
@@ -117,7 +116,7 @@ def dashboard():
     else:
         return redirect('/login')
 
-# 🚪 Logout — Blacklist Token to Prevent Reuse
+# Logout 
 @app.route('/logout')
 def logout():
     if 'session_token' in session:
@@ -125,7 +124,6 @@ def logout():
     session.clear()
     return redirect('/')
 
-# 🏁 Run App
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
